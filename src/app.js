@@ -2,8 +2,6 @@ const API_KEY = "637afa20618583ab69af603bf4957c4a";
 const API_HREF = "https://api.themoviedb.org/3";
 const IMAGES_HREF = "https://image.tmdb.org/t/p/w400";
 
-//https://api.themoviedb.org/3/movie/181812/recommendations?api_key=637afa20618583ab69af603bf4957c4a
-
 const data = {
   movies: [],
   selectedMovie: null
@@ -24,13 +22,12 @@ function setSearchHandler() {
     // if empty search query
     if (query === "") return;
     data.selectedMovie = null;
-    getData({
+    getDataAsync({
       params: ["search", "movie"],
-      query,
-      cb: movies => {
-        data.movies = movies || [];
-        render();
-      }
+      query
+    }).then(movies => {
+      data.movies = movies || [];
+      render();
     });
   };
 
@@ -42,32 +39,50 @@ function setSearchHandler() {
 
 function displayTrends() {
   data.selectedMovie = null;
-  getData({
-    params: ["trending", "movie", "week"],
-    cb: movies => {
-      data.movies = movies || [];
+
+  Promise.all([
+    getDataAsync({
+      params: ["trending", "movie", "week"]
+    }),
+    getDataAsync({
+      params: ["trending", "tv", "week"]
+    })
+  ])
+    .then(([movies, tv]) => {
+      data.movies = [];
+      // set title property for tv-serials
+      tv = tv.map(t => {
+        return { ...t, title: t.name };
+      });
+
+      for (let i = 0; i < 10 && i < movies.length && i < tv.length; i++) {
+        data.movies.push(movies[i], tv[i]);
+      }
+
       render();
-    }
-  });
+    })
+    .catch(error => alert(error));
 }
 
-function getData({ params = [], query = "", cb }) {
-  if (params.length > 0) {
-    params = "/" + params.join("/");
-  }
-  if (query) {
-    query = "&query=" + query;
-  }
-  let href = `${API_HREF}${params}?api_key=${API_KEY}${query}`;
-  fetch(href)
-    .then(response => {
-      response.json().then(json => {
-        cb(json.results);
+function getDataAsync({ params = [], query = "" }) {
+  return new Promise((resolve, reject) => {
+    if (params.length > 0) {
+      params = "/" + params.join("/");
+    }
+    if (query) {
+      query = "&query=" + query;
+    }
+    let href = `${API_HREF}${params}?api_key=${API_KEY}${query}`;
+    fetch(href)
+      .then(response => {
+        response.json().then(json => {
+          resolve(json.results);
+        });
+      })
+      .catch(error => {
+        reject(error);
       });
-    })
-    .catch(error => {
-      console.log("Something goes wrong: ", error);
-    });
+  });
 }
 
 function render() {
@@ -109,17 +124,21 @@ function renderMovieDetails() {
   recommendations.innerText = "Load...";
 
   // load recommendations
-  getData({
-    params: ["movie", movie.id, "recommendations"],
-    cb: movies => {
-      recommendations.innerHTML = "";
-      let wrapper = document.createElement("div");
-      for (let i = 0; i < movies.length && i < 5; i++) {
-        const movie = movies[i];
-        wrapper.appendChild(createListItem(movie, displayMovie));
-      }
-      recommendations.appendChild(wrapper);
+  getDataAsync({
+    params: ["movie", movie.id, "recommendations"]
+  }).then(movies => {
+    recommendations.innerHTML = "";
+
+    if (movies.length === 0) {
+      recommendations.innerText = "Recommendations not found :(";
     }
+
+    let wrapper = document.createElement("div");
+    for (let i = 0; i < movies.length && i < 5; i++) {
+      const movie = movies[i];
+      wrapper.appendChild(createListItem(movie, displayMovie));
+    }
+    recommendations.appendChild(wrapper);
   });
 }
 

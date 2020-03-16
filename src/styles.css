@@ -38,6 +38,7 @@ body {
 }
 .movies-list-item:hover {
   background-color: #eee;
+  text-decoration: underline;
 }
 .movies-list-item .title {
   margin: 0;
