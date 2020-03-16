@@ -1,0 +1,45 @@
+body {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: 16pt;
+}
+
+#app {
+  width: 70%;
+  margin: 0 auto;
+}
+.search-panel {
+  margin: 20px 0;
+  width: max-content;
+}
+.search-panel input {
+  font-size: 16pt;
+}
+#trends-button {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+.search-panel input[type="submit"] {
+  background-color: rgb(47, 226, 107);
+  padding: 5px 10px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+#movie-details,
+#movies-list {
+  display: none;
+}
+
+.movies-list-item {
+  cursor: pointer;
+  padding: 10px;
+}
+.movies-list-item:hover {
+  background-color: #eee;
+}
+.movies-list-item .title {
+  margin: 0;
+  font-weight: normal;
+}

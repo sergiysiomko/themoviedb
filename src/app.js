@@ -12,7 +12,7 @@ const data = {
 window.onload = function() {
   displayTrends();
   setSearchHandler();
-}
+};
 
 function setSearchHandler() {
   searchForm = document.getElementById("search-form");
@@ -32,6 +32,11 @@ function setSearchHandler() {
         render();
       }
     });
+  };
+
+  // set trends button handler
+  document.getElementById("trends-button").onclick = () => {
+    displayTrends();
   };
 }
 
@@ -87,7 +92,7 @@ function render() {
 function renderMovieDetails() {
   const movie = data.selectedMovie;
   const movieDetails = document.getElementById("movie-details");
-  
+
   // set data
   const poster = movieDetails.getElementsByClassName("poster")[0];
   poster.setAttribute("src", IMAGES_HREF + movie.poster_path);
@@ -98,22 +103,24 @@ function renderMovieDetails() {
   const overview = movieDetails.getElementsByClassName("overview")[0];
   overview.innerText = movie.overview;
 
-  const recommendations = movieDetails.getElementsByClassName("recommendations")[0];
+  const recommendations = movieDetails.getElementsByClassName(
+    "recommendations"
+  )[0];
   recommendations.innerText = "Load...";
 
   // load recommendations
   getData({
-    params:["movie", movie.id,"recommendations"],
-    cb:(movies)=>{
-        recommendations.innerHTML = "";
-        let wrapper = document.createElement("div")
-        for (let i = 0; i < movies.length && i<5; i++) {
-          const movie = movies[i];
-          wrapper.appendChild(createListItem(movie,displayMovie))
-        }
-        recommendations.appendChild(wrapper)
+    params: ["movie", movie.id, "recommendations"],
+    cb: movies => {
+      recommendations.innerHTML = "";
+      let wrapper = document.createElement("div");
+      for (let i = 0; i < movies.length && i < 5; i++) {
+        const movie = movies[i];
+        wrapper.appendChild(createListItem(movie, displayMovie));
+      }
+      recommendations.appendChild(wrapper);
     }
-  })
+  });
 }
 
 function renderMoviesList() {
@@ -143,6 +150,7 @@ function createListItem(movie, displayMovie) {
   item.className = "movies-list-item";
   item.id = movie.id;
   let title = document.createElement("h5");
+  title.className = "title";
   title.innerText = movie.title;
   item.appendChild(title);
   item.onclick = function() {
@@ -152,6 +160,6 @@ function createListItem(movie, displayMovie) {
 }
 
 function displayMovie(movie) {
-    data.selectedMovie = movie;
-    render();
+  data.selectedMovie = movie;
+  render();
 }
