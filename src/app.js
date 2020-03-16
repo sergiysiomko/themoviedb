@@ -13,7 +13,7 @@ window.onload = function() {
 };
 
 function setSearchHandler() {
-  searchForm = document.getElementById("search-form");
+  const searchForm = document.getElementById("search-form");
   searchForm.onsubmit = function(e) {
     e.preventDefault();
 
@@ -89,7 +89,7 @@ function render() {
   const moviesList = document.getElementById("movies-list");
   const movieDetails = document.getElementById("movie-details");
 
-  if (!!data.selectedMovie == true) {
+  if (!!data.selectedMovie === true) {
     // render movie details
 
     movieDetails.style.display = "block";
